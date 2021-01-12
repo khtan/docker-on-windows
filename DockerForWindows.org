@@ -408,6 +408,7 @@ Successfully tagged dockeronwindows/ch03-iis-log-watcher:2e
 docker container port log-watcher
 80/tcp -> 0.0.0.0:12846
 ********* set browser to http://localhost:12846
+Will see IISHOME PAGE
 ********* c:\>docker container logs log-watcher
 docker container logs log-watcher
 2020-12-25 18:34:27 W3SVC1 ::1 GET / - 80 - ::1 Mozilla/5.0+(Windows+NT;+Windows+NT+10.0;+en-US)+WindowsPowerShell/5.1.17763.592 - 200 0 0 214
@@ -1947,12 +1948,13 @@ Complex change makes it hard to estimate benefit before implementation
 Identify one feature that makes expensive database calls but does not need to be synch
    Move that functionality to a separate component
    Use async messaging betwen components 
-
+[[C:\cprojects\pp\virtualization\docker\Docker-on-Windows-Second-Edition\images\ch05-designgoals.png][ch05-designgoals.png]]
 ******* Dockerizing NerdDinner's configuration
 Update code to use .NET Core configuration model
    1. appSettings.config and connectionStrings.config => appsettings.json
 
 docker container --env-file <path>
+appsettings.json
 
 ******* Splitting out the create dinner feature
 ******* Packaging .NET console apps in Docker
@@ -2200,8 +2202,6 @@ c3c8f3567320   dockeronwindows/ch05-nats:2e                              "gnatsd
 171f9889e8e9   dockeronwindows/ch03-nerd-dinner-db:2e                    "powershell -Command…"      25 hours ago   Up 25 hours                                            ch06-docker-compose_nerd-dinner-db_1
 948e8ff14c31   dockeronwindows/ch03-nerd-dinner-homepage:2e              "dotnet NerdDinner.H…"      25 hours ago   Up 25 hours             80/tcp                         ch06-docker-compose_nerd-dinner-homepage_1
 
-
-
 ***** ch7  Orchestrating Distributed Solutions with Docker Swarm
 ****** Creating a swarm and managing nodes
 ****** Creating and managing services in swarm mode
@@ -2314,4 +2314,52 @@ c3c8f3567320   dockeronwindows/ch05-nats:2e                              "gnatsd
 ****** Summary
 
 ***** other books you may enjoy
+** kwee1
+*** ch3
+**** log-watcher
+docker container run -d -P --name log-watcher dockeronwindows/ch03-iis-log-watcher:2e
+docker port log-watcher // get ports
+localhost::<port>
+docker logs log-watcher // to see the logs
+**** aspnet-config-default
+docker container run -d -P --name aspnet-config-default dockeronwindows/ch03-aspnet-config:2e
+docker port aspnet-config-default
+localhost:<port> // shows App Settings and Connection Strings
+**** iis-env
+docker container run -d -P --name iis-env dockeronwindows/ch03-iis-environment-variables:2e
+docker port iis-env 
+localhost:<port> // shows Machine and Process level EVs
+**** healthcheck
+docker container run -d -P --name healthcheck dockeronwindows/ch03-iis-healthcheck:2e
+docker container port healthcheck 
+localhost:<port>/diagnostics
+docker container ls // shows status as (healthy or unhealthy)
+**** nerd-dinner-db
+mkdir -p d:\databases\nd
+docker container run -d -p 1433:1433 --name nerd-dinner-db -v d:\databases\nd:c:\data dockeronwindows/ch03-nerd-dinner-db:2e
 
+sqlectron to connect to nerd-dinner-db with 'sa' and password
+ See Step 10/17 : ENV SA_PASSWORD="N3rdD!Nne720^6"     HOMEPAGE_URL=""
+**** x nerd-dinner-web
+docker container run -d -P --name nerd-dinner-web dockeronwindows/ch03-nerd-dinner-web:2e
+docker port nerd-dinner-web 
+localhost:<port> // shows nerddinner homepage
+   register new user: elton p:eltonelton
+   check in sqlelectron that UserProfile table contains elton user
+**** nerd-dinner-web + nerd-dinner-homepage
+docker container run -d -P --name nerd-dinner-homepage dockeronwindows/ch03-nerd-dinner-homepage:2e
+docker port nerd-dinner-homepage
+localhost:<homepage-port> // nerd dinner home page comes up
+                          // "find" goes to localhost:<homepage-port>/home/find which does not work
+
+// This is not needed $Env:HOMEPAGE_URL= "http://localhost:<homepage-port>"
+docker container stop nerd-dinner-web
+docker container run -d -P --name nerd-dinner-web dockeronwindows/ch03-nerd-dinner-web:v2
+docker port nerd-dinner-web //
+localhost:<dinner-web-port> shows the basic homepage
+Click Find Dinner shows localhost:<dinner-web-port>/home/find
+
+
+There appears to be 2 env variables that :
+HOMEPAGE_URL http://nerd-dinner-homepage
+NERD_DINNER_URL /home/find
