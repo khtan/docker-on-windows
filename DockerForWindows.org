@@ -2651,5 +2651,50 @@ labels:
 *** running
 docker-compose up -d reverse-proxy
 docker-compose up -d whoami
+docker-compoese -f <composefile> up -d <service>
+docker-compose -f simple.lin.dc.yml up -d traefik
+
+air: switching to linux does not seem to work
+     desktop appears ready but the system app is stuck at switching, then still shows "switch to linux containers"
+
+**** PS C:\cprojects\pp\virtualization\docker\docker-on-windows.khtan\traefik> docker-compose -f simple.lin.dc.yml up -d traefik
+DEBUG:    1+  >>>> docker-compose -f simple.lin.dc.yml up -d traefik
+DEBUG:     ! CALL function '<ScriptBlock>'
+Creating network "traefik_default" with the default driver
+Pulling traefik (traefik:v2.3)...
+v2.3: Pulling from library/traefik
+0a6724ff3fcd: Pull complete
+64d0c2f48fed: Pull complete
+00390834f324: Pull complete
+059f159f3940: Pull complete
+Digest: sha256:0181e35c5af98f7f30fb391f91a6dbd281a90d7cf971e9909e26afd4ea923251
+Status: Downloaded newer image for traefik:v2.3
+Creating traefik_traefik_1 ... error
+
+ERROR: for traefik_traefik_1  Cannot start service traefik: Ports are not available: listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ERROR: for traefik  Cannot start service traefik: Ports are not available: listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ERROR: Encountered errors while bringing up the project.
+
+***** [[https://help.socketlabs.com/docs/how-to-fix-error-only-one-usage-of-each-socket-address-protocolnetwork-addressport-is-normally-permitted][how to fix: only one usage of each socket address]]
+One of the ways is to increase the dynamic port range. The max by default is 5000. You can set this up to 65534. HKLM\System\CurrentControl\SetServices\Tcpip\Parameters\MaxUserPort is the
+key to use.
+
+The second thing you can do is, once the connection does get into an TIME_WAIT state, you can reduce the time it is in that state. Default is 4 minutes, but you can set this to 30 seconds.
+HKLM\System\CurrentControlSet\Services\Tcpip\Parameters\TCPTimedWaitDelay is the key to use.
+
+After these changes are made the system must be restarted.
+
+\\air already has these settings
+
+***** check who is holding :8080
+air: 
+netstat -aof | findstr :8080
+shows pid 7264
+procexp shows 7264 is chrome on windows
+stopped chrome on win10
+
+Still same error, showing somehow linux side is still holding :8080.
+
+kwee1: 
 
 *** docker container stop $(docker container list -q)
