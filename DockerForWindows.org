@@ -2021,15 +2021,39 @@ At this point, there are 5 containers and should be working
     7. nerd-dinner-proxy
 
  [[file:ch05/ch05-run-nerd-dinner_part-2.ps1::docker container rm -f nerd-dinner-homepage][script: ch05-run-nerd-dinner_part-2.ps1]]
+1. Need to run powershell in Administrator account and then add this:
+Set-ExecutionPolicy RemoteSigned, entering A for all
+2. Set-PSDebug -trace 2
+2. Add to hosts file c:\windows\system32\drivers\etc\hosts
+127.0.0.1 nerddinner.local
+127.0.0.1 api.nerddinner.local
 
  So, you can nerd-dinner-proxy:80 to get to Traefik's reverse proxying
-******* error message
+******* air: error message
  docker: Error response from daemon: failed to create endpoint reverse-proxy on network nat: 
  failed during hnsCallRawResponse: 
  hnsCall failed in Win32: 
  The process cannot access the file because it is being used by another process. (0x20).
-*******  could be due to port conflict
+******* air: could be due to port conflict
 https://github.com/docker/for-win/issues/1755
+******* kwee1 : 
+reverse-proxy fails with the log :
+docker logs reverse-proxy -n 2
+time="2021-01-16T17:44:59-08:00" level=error msg="Failed to retrieve information of the docker client and server host: error during connect: Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running."
+time="2021-01-16T17:44:59-08:00" level=error msg="Provider connection error 
+a) Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: 
+b) open //./pipe/docker_engine: message readmode pipes not supported 
+c) In the default daemon configuration on Windows, the docker client must be run elevated to connect. 
+d) This error may also indicate that the docker daemon is not running.
+
+\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:182\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:137\ngithub.com/containous/traefik/safe.OperationWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:160\ngithub.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify\n\t/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:252\ngithub.com/containous/traefik/safe.(*Pool).GoCtx.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:62\ngithub.com/containous/traefik/safe.GoWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:142\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1333\nerror during connect\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:185\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:137\ngithub.com/containous/traefik/safe.OperationWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:160\ngithub.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify\n\t/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:252\ngithub.com/containous/traefik/safe.(*Pool).GoCtx.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:62\ngithub.com/containous/traefik/safe.GoWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:142\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1333, retrying in 17.551268228s"
+https://github.com/StefanScherer/dockerfiles-windows/issues/383
+   has a soln for docker compose using isolation: hyperv
+This did not seem to work.
+
+Log:
+time="2021-01-16T18:11:08-08:00" level=error msg="Failed to retrieve information of the docker client and server host: error during connect: Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running."
+time="2021-01-16T18:11:08-08:00" level=error msg="Provider connection error Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running.\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:182\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:137\ngithub.com/containous/traefik/safe.OperationWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:160\ngithub.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify\n\t/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:252\ngithub.com/containous/traefik/safe.(*Pool).GoCtx.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:62\ngithub.com/containous/traefik/safe.GoWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:142\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1333\nerror during connect\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:185\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:137\ngithub.com/containous/traefik/safe.OperationWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:160\ngithub.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify\n\t/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:252\ngithub.com/containous/traefik/safe.(*Pool).GoCtx.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:62\ngithub.com/containous/traefik/safe.GoWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:142\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1333, retrying in 369.950822ms"
 
 
 ****** routing http requests between containers with a reverse proxy
@@ -2480,3 +2504,152 @@ Click Find Dinner shows localhost:<dinner-web-port>/home/find
 There appears to be 2 env variables that :
 HOMEPAGE_URL http://nerd-dinner-homepage
 NERD_DINNER_URL /home/find
+*** ch5
+**** START [[https://github.com/sixeyed/docker-on-windows/issues/17][github issue: ch05 reverse-proxy has problems]]
+
+     - State "START"      from              [2021-01-17 Sun 15:17]
+Thank you for an excellent book. I have been reading and following through your examples and through the
+standardization that Docker provides, the examples still run as expected.
+
+However, in Ch5, when I run ch05-run-nerd-dinner_part-2.ps1 ( after part-1 ), I noticed that while the reverse-proxy service does run, the transcript indicates some errors.
+Log:
+1 > time="2021-01-16T18:11:08-08:00" level=error msg="Failed to retrieve information of the docker client and server host: error during connect: Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running."
+2 > time="2021-01-16T18:11:08-08:00" level=error msg="Provider connection error Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running.
+>
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:182
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12
+> github.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1
+> 	/go/src/github.com/containous/traefik/provider/docker/docker.go:137
+> github.com/containous/traefik/safe.OperationWithRecover.func1
+> 	/go/src/github.com/containous/traefik/safe/routine.go:160
+> github.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify
+> 	/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37
+> github.com/containous/traefik/provider/docker.(*Provider).Provide.func1
+> 	/go/src/github.com/containous/traefik/provider/docker/docker.go:252
+> github.com/containous/traefik/safe.(*Pool).GoCtx.func1
+> 	/go/src/github.com/containous/traefik/safe/routine.go:62
+> github.com/containous/traefik/safe.GoWithRecover.func1
+> 	/go/src/github.com/containous/traefik/safe/routine.go:142
+> runtime.goexit
+> 	/usr/local/go/src/runtime/asm_amd64.s:1333
+> error during connect
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:185
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37
+> github.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion
+> 	/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12
+> github.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1
+> 	/go/src/github.com/containous/traefik/provider/docker/docker.go:137
+> github.com/containous/traefik/safe.OperationWithRecover.func1
+> 	/go/src/github.com/containous/traefik/safe/routine.go:160
+> github.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify
+> 	/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37
+> github.com/containous/traefik/provider/docker.(*Provider).Provide.func1
+> 	/go/src/github.com/containous/traefik/provider/docker/docker.go:252
+> github.com/containous/traefik/safe.(*Pool).GoCtx.func1
+> 	/go/src/github.com/containous/traefik/safe/routine.go:62
+> github.com/containous/traefik/safe.GoWithRecover.func1
+> 	/go/src/github.com/containous/traefik/safe/routine.go:142
+> runtime.goexit
+> 	/usr/local/go/src/runtime/asm_amd64.s:1333, retrying in 369.950822ms"
+> 
+
+Here is my Docker environment :
+   Powershell : run as an Administrator, with ExecutionPolicy = RemoteSigned, All.
+   PC: Windows 10, 2004
+   Docker Desktop: 3.0.4
+   Docker Engine: 20.10.2
+
+
+Tried the following 
+
+1. Added --isolation hyperv option to Docker run did not work
+   Based on https://github.com/StefanScherer/dockerfiles-windows/issues/383
+
+2.Substitute sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019 for a newer Traefix traefik:v2.3.7-windowsservercore-1809 failed with error : 
+   > 2021/01/16 21:13:12 command traefik error: failed to decode configuration from flags: field not found, node: docker
+   This tells me that I should look at the Dockerfile for sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019 to find out how the --docker flag should be handled.
+   Unfortunately it is a container, not an image and does not have the Dockerfile available.
+
+Hopefully, you can provide some guidance to get your example working again.
+
+Thanks,
+** traefik
+*** initial
+traefik.io
+  Website is Linux centric, does not even mentions Windows
+
+products:
+  traefik proxy
+  traefik mesh
+  traefik enterprise
+  traefik pilot
+
+This book uses MacOs but there is no source code to download.
+So I expect a Windows version can work.
+
+apress: https://www.apress.com/us/book/9781484263754
+*** linux docker-compose.yml
+
+version: '3'
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.3
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+*** windows docker-compose.yml      
+version: '3'
+services:
+traefik:
+image: traefik
+command: --api.insecure=true --providers.docker --providers.docker.endpoint=npipe:////./pipe/docker_engine
+ports:
+- "8080:8080" # Please read: https://docs.traefik.io/configuration/api/#security
+- "443:443"
+- "80:80"
+isolation: process # workaround for https://github.com/containous/traefik/issues/4409 4
+volumes:
+- type: npipe
+source: \.\pipe\docker_engine
+target: \.\pipe\docker_engine
+
+whoami1:
+image: stefanscherer/whoami
+labels:
+- "traefik.http.routers.whoami1.rule=Host(whoami1.docker.localhost)"
+
+whoami2:
+image: stefanscherer/whoami
+labels:
+- "traefik.http.routers.whoami2.rule=Host(whoami2.docker.localhost)"
+
+*** running
+docker-compose up -d reverse-proxy
+docker-compose up -d whoami
+
+*** docker container stop $(docker container list -q)

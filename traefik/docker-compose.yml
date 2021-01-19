@@ -1,0 +1,23 @@
+version: '3'
+services:
+  traefik:
+    image: sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019
+    command: --api.insecure=true --providers.docker --providers.docker.endpoint=npipe:////./pipe/docker_engine
+    ports:
+      - "8080:8080" # Please read: https://docs.traefik.io/configuration/api/#security
+      - "443:443"
+      - "80:80"
+    isolation: hyperv # workaround for https://github.com/containous/traefik/issues/4409 4
+    volumes:
+      - type: npipe
+        source: \\.\pipe\docker_engine
+        target: \\.\pipe\docker_engine
+
+  whoami1:
+    image: stefanscherer/whoami
+    labels:
+      - "traefik.http.routers.whoami1.rule=Host(whoami1.docker.localhost)"
+  whoami2:
+    image: stefanscherer/whoami
+    labels:
+      - "traefik.http.routers.whoami2.rule=Host(whoami2.docker.localhost)"
