@@ -1,13 +1,16 @@
 version: '3'
 services:
   traefik:
-    image: sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019
-    command: --api.insecure=true --providers.docker --providers.docker.endpoint=npipe:////./pipe/docker_engine
+    # image: sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019
+    # image: traefik:v1.7.28-windowsservercore-1809
+    image: traefik:windowsservercore-1809
+    command: --api=true --docker --docker.endpoint=npipe:////./pipe/docker_engine
     ports:
       - "8080:8080" # Please read: https://docs.traefik.io/configuration/api/#security
       - "443:443"
       - "80:80"
     isolation: hyperv # workaround for https://github.com/containous/traefik/issues/4409 4
+    # isolation: process # fails because OS needs to match exactly
     volumes:
       - type: npipe
         source: \\.\pipe\docker_engine
