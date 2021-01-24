@@ -62,45 +62,71 @@ code: https://media.wiley.com/product_ancillary/88/04706431/DOWNLOAD/97804706431
 **** ch1 Getting Started with Docker on Windows [[C:\cprojects\pp\virtualization\docker\Docker-on-Windows-Second-Edition\ch01\build.org][build.org]]
 ***** docker on desktop
 ****** baseline
-******* air : has docker, no WSL
-******** [[./images/DockerDesktop.air.png][Docker Desktop dialog]]
- Currently my Docker Desktop Community dialog shows 
- Version: 2.1.05 (40693)
- Channel: stable
- Engine: 19.03.5
- Notary: 0.6.1
- Compose: 1.24.1
- Credential Helpers : 0.6.3
- Kubernetes: 1.14.8
- Machine: 0.16.2
+******* air
+******** air : has docker, no WSL
+********* [[./images/DockerDesktop.air.png][Docker Desktop dialog]]
+  Currently my Docker Desktop Community dialog shows 
+  Version: 2.1.05 (40693)
+  Channel: stable
+  Engine: 19.03.5
+  Notary: 0.6.1
+  Compose: 1.24.1
+  Credential Helpers : 0.6.3
+  Kubernetes: 1.14.8
+  Machine: 0.16.2
 
-docker --version only gives one version. 
-What is the commmand line that would give more these versions? docker version
-Yet pieces like Notary, Compose etc do not give out their version.
+ docker --version only gives one version. 
+ What is the commmand line that would give more these versions? docker version
+ Yet pieces like Notary, Compose etc do not give out their version.
 
-******** c:\cprojects\github>docker --version
-docker --version
-Docker version 19.03.5, build 633a0ea
-******** c:\cprojects\github>docker version
-docker version
-Client: Docker Engine - Community
- Version:           19.03.5
- API version:       1.40
- Go version:        go1.12.12
- Git commit:        633a0ea
- Built:             Wed Nov 13 07:22:37 2019
- OS/Arch:           windows/amd64
- Experimental:      true
+********* c:\cprojects\github>docker --version
+ docker --version
+ Docker version 19.03.5, build 633a0ea
+********* c:\cprojects\github>docker version
+ docker version
+ Client: Docker Engine - Community
+  Version:           19.03.5
+  API version:       1.40
+  Go version:        go1.12.12
+  Git commit:        633a0ea
+  Built:             Wed Nov 13 07:22:37 2019
+  OS/Arch:           windows/amd64
+  Experimental:      true
 
-Server: Docker Engine - Community
- Engine:
-  Version:          19.03.5
-  API version:      1.40 (minimum version 1.24)
-  Go version:       go1.12.12
-  Git commit:       633a0ea
-  Built:            Wed Nov 13 07:36:50 2019
-  OS/Arch:          windows/amd64
-  Experimental:     true
+ Server: Docker Engine - Community
+  Engine:
+   Version:          19.03.5
+   API version:      1.40 (minimum version 1.24)
+   Go version:       go1.12.12
+   Git commit:       633a0ea
+   Built:            Wed Nov 13 07:36:50 2019
+   OS/Arch:          windows/amd64
+   Experimental:     true
+******** DONE update to WSL2
+         CLOSED: [2021-01-24 Sun 13:14]
+         - State "DONE"       from              [2021-01-24 Sun 13:14]
+********* docker version
+ Client: Docker Engine - Community
+  Cloud integration: 1.0.7
+  Version:           20.10.2
+  API version:       1.41
+  Go version:        go1.13.15
+  Git commit:        2291f61
+  Built:             Mon Dec 28 16:14:16 2020
+  OS/Arch:           windows/amd64
+  Context:           default
+  Experimental:      true
+
+ Server: Docker Engine - Community
+  Engine:
+   Version:          20.10.2
+   API version:      1.41 (minimum version 1.24)
+   Go version:       go1.13.15
+   Git commit:       8891c58
+   Built:            Mon Dec 28 16:26:48 2020
+   OS/Arch:          windows/amd64
+   Experimental:     false
+********* [[./images/DockerDesktop.air.24Jan2021.png][DockerDesktop.air.24Jan2021.png]]
 ******* kwee1: has docker, WSL
 ******** [[./images/DockerDesktop.kwee1.png][Docker Desktop dialog]]
  Version: 3.0.0 (50684)
@@ -2456,7 +2482,7 @@ c3c8f3567320   dockeronwindows/ch05-nats:2e                              "gnatsd
 
 **** other books you may enjoy
 ** kwee1
-*** ch3
+*** ch03
 **** log-watcher
 docker container run -d -P --name log-watcher dockeronwindows/ch03-iis-log-watcher:2e
 docker port log-watcher // get ports
@@ -2504,7 +2530,7 @@ Click Find Dinner shows localhost:<dinner-web-port>/home/find
 There appears to be 2 env variables that :
 HOMEPAGE_URL http://nerd-dinner-homepage
 NERD_DINNER_URL /home/find
-*** ch5
+*** ch05
 **** START [[https://github.com/sixeyed/docker-on-windows/issues/17][github issue: ch05 reverse-proxy has problems]]
 
      - State "START"      from              [2021-01-17 Sun 15:17]
