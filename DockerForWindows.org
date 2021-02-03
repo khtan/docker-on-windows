@@ -1912,6 +1912,14 @@ a80845b44a92: Pull complete
 Digest: sha256:7fcd23eb0956d490ecb0e6fdd923c7aa7f6732b99af627cd9138a2d93f59f0fe
 Status: Downloaded newer image for dockeronwindows/ch03-nerd-dinner-web:2e
 db86d4bf9c883eee637de1de1a28f55205623944df9d960c7267100f5fe50d00
+******* xxx
+   mkdir -p c:\databases\nd
+   docker container run -d -p 1433:1433 --name nerd-dinner-db -v d:\databases\nd:c:\data dockeronwindows/ch03-nerd-dinner-db:2e
+   docker container run -d -P --name nerd-dinner-web dockeronwindows/ch03-nerd-dinner-web:2e
+
+ch03-nerd-dinner-web 80/tcp -> 0.0.0.0:23908
+ch03-nerd-dinner-db 1433/tcp -> 0.0.0.0.1433
+
 ***** breaking up monolithic applications
 ****** extracting high value components from monoliths
 ****** hosting a ui component in asp.net core app
@@ -2724,3 +2732,319 @@ Still same error, showing somehow linux side is still holding :8080.
 kwee1: 
 
 *** docker container stop $(docker container list -q)
+** mixing windows and linux containers with docker compose 03/21/2019
+*** https://devblogs.microsoft.com/premier-developer/mixing-windows-and-linux-containers-with-docker-compose/
+[[https://github.com/RandyPatterson/DockerComposeMultiPlatform][github]]
+
+platform configuration was added to Docker Compose in 2.4 and removed in 3.x
+docker desktop : 2.0.0.2 has section to turn on Experimental
+ vs 3.1.0 Experimental looks different 
+
+In Docker Desktop, under Windows, enter the Docker Engine configuration with "experimental": true.
+Able to 
+docker container run --name whalesaylin  --platform=linux docker/whalesay cowsay moo
+   but failed to shutdown container error
+***** linux
+  docker image build -t apitier:linux apitier
+  docker run apitier
+*****   win
+  docker image build -t webtier:win webtier
+  docker run webtier
+
+*** c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>docker image build -t apitier:linux apitier
+ Sending build context to Docker daemon  4.028MB
+ Step 1/13 : FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
+ 2.1-aspnetcore-runtime: Pulling from microsoft/dotnet
+ 9334511b2b1d: Pull complete
+ edbe6aae2e0e: Pull complete
+ 77eb333f05cd: Pull complete
+ ea739468fddc: Pull complete
+ 31d19bab185a: Pull complete
+ 162d668abe7f: Pull complete
+ Digest: sha256:c6abe7059b096c890700ae3a31f4452dc27ee4135c82040ec14ecfc233a35d7b
+ Status: Downloaded newer image for microsoft/dotnet:2.1-aspnetcore-runtime
+  ---> 9a9d1dbe76dc
+ Step 2/13 : WORKDIR /app
+  ---> Running in 4226f6de0fd3
+ Removing intermediate container 4226f6de0fd3
+  ---> 274ca6b7112b
+ Step 3/13 : EXPOSE 80
+  ---> Running in eabe8280a974
+ Removing intermediate container eabe8280a974
+  ---> 1fcb7b643fb3
+ Step 4/13 : FROM microsoft/dotnet:2.1-sdk AS build
+ 2.1-sdk: Pulling from microsoft/dotnet
+ 9334511b2b1d: Already exists
+ 4736d12bef22: Pull complete
+ 3252e0d93d7c: Pull complete
+ 3a86ee343217: Pull complete
+ 71c443a95ab6: Pull complete
+ 6548a03b6dea: Pull complete
+ 9024f5c5c2e6: Pull complete
+ Digest: sha256:8bb207493e4e79ad5a7ed5f3c834f4792d6013100f89889126344c3543d98584
+ Status: Downloaded newer image for microsoft/dotnet:2.1-sdk
+  ---> a561ed1ed9d3
+ Step 5/13 : WORKDIR "/src/ApiTier"
+  ---> Running in 54c17e13d86d
+ Removing intermediate container 54c17e13d86d
+  ---> e404e3971bb2
+ Step 6/13 : COPY . .
+  ---> 003d1252d3e3
+ Step 7/13 : RUN dotnet build "WebApi.csproj" -c Release -o /app
+ d9e8b01179bf: Downloading [======>                                            ]  205.3MB/1.66GB
+ 3eb83143ff4b: Downloading [===========>                                       ]  159.7MB/696.1MB
+ Copyright (C) Microsoft Corporation. All rights reserved.
+ 23422103fdff: Downloading [=================================>                 ]    249MB/366.6MB
+ 3eb83143ff4b: Downloading [==========>                                        ]  152.7MB/696.1MB
+   WebApi -> C:\app\WebApi.dll
+ 23422103fdff: Downloading [=================================>                 ]  247.4MB/366.6MB
+ 3eb83143ff4b: Downloading [==========>                                        ]  151.6MB/696.1MB
+ Build succeeded.
+     0 Warning(s)
+ d9e8b01179bf: Downloading [======>                                            ]  209.1MB/1.66GB
+ 3eb83143ff4b: Downloading [===========>                                       ]  163.6MB/696.1MB
+ d9e8b01179bf: Downloading [=====>                                             ]  197.1MB/1.66GB
+ 23422103fdff: Downloading [==================================>                ]  251.7MB/366.6MB
+  ---> 90f0122cb121
+ 23422103fdff: Downloading [=================================>                 ]  246.9MB/366.6MB
+  ---> 90f0122cb121
+ Step 9/13 : RUN dotnet publish "WebApi.csproj" -c Release -o /app
+  ---> Running in 0980a9f014e6
+ Microsoft (R) Build Engine version 16.2.37902+b5aaefc9f for .NET Core
+ Copyright (C) Microsoft Corporation. All rights reserved.
+ d9e8b01179bf: Downloading [=====>                                             ]  193.9MB/1.66GB
+ d9e8b01179bf: Downloading [======>                                            ]  209.6MB/1.66GB
+   WebApi -> C:\src\ApiTier\bin\Release\netcoreapp2.1\WebApi.dll
+ 23422103fdff: Downloading [=================================>                 ]  246.3MB/366.6MB
+ d9e8b01179bf: Downloading [======>                                            ]  211.8MB/1.66GB
+ 3eb83143ff4b: Downloading [===========>                                       ]  165.2MB/696.1MB
+ d9e8b01179bf: Downloading [=====>                                             ]  192.8MB/1.66GB
+ 23422103fdff: Downloading [==================================>                ]  254.4MB/366.6MB
+  ---> 1fcb7b643fb3
+ Step 11/13 : WORKDIR /app
+ d9e8b01179bf: Downloading [======>                                            ]  212.9MB/1.66GB
+ 3eb83143ff4b: Downloading [===========>                                       ]  166.3MB/696.1MB
+ 23422103fdff: Downloading [==================================>                ]  254.9MB/366.6MB
+ 23422103fdff: Downloading [==================================>                ]    256MB/366.6MB
+  ---> 061355e4aca8
+ 23422103fdff: Downloading [=================================>                 ]  245.8MB/366.6MB
+ 3eb83143ff4b: Downloading [==========>                                        ]  145.7MB/696.1MB
+ Removing intermediate container f33c547c91e6
+ d9e8b01179bf: Downloading [=====>                                             ]  190.6MB/1.66GB
+ 3eb83143ff4b: Downloading [==========>                                        ]  145.2MB/696.1MB
+ Successfully tagged apitier:linux
+ 23422103fdff: Downloading [=================================>                 ]  245.3MB/366.6MB
+ 3eb83143ff4b: Downloading [==========>                                        ]  140.3MB/696.1MB
+*** c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>docker image build -t webtier:win webtier
+ Sending build context to Docker daemon  12.58MB
+ d9e8b01179bf: Downloading [======>                                            ]  213.4MB/1.66GB
+ 4.7.2-windowsservercore-1803: Pulling from microsoft/aspnet
+ 23422103fdff: Downloading [===================================>               ]  257.1MB/366.6MB
+ 3eb83143ff4b: Downloading [==========>                                        ]  139.7MB/696.1MB
+ 97c1d214c388: Download complete
+ 23422103fdff: Downloading [===============================>                   ]  232.4MB/366.6MB
+ 7b0dda834947: Waiting
+ 2666f9a29637: Waiting
+ 3dc5f513377c: Waiting
+ 7decfc07bba1: Waiting
+ 2149ff53a2ba: Waiting
+ 43a2736b76cc: Waiting
+
+
+
+ d9e8b01179bf: Pull complete
+ 3eb83143ff4b: Pull complete
+ 97c1d214c388: Pull complete
+ 23422103fdff: Pull complete
+ 7b0dda834947: Pull complete
+ 2666f9a29637: Pull complete
+ 3dc5f513377c: Pull complete
+ 7decfc07bba1: Pull complete
+ 2149ff53a2ba: Pull complete
+ 43a2736b76cc: Pull complete
+ Digest: sha256:a55aebebbbc4a56f6342e8f5e6eabc0ef0112de3c1b0cdae93739f7f894b0f5d
+ Status: Downloaded newer image for microsoft/aspnet:4.7.2-windowsservercore-1803
+  ---> a3488807da11
+ Step 2/3 : WORKDIR /inetpub/wwwroot
+  ---> Running in 093d95690d37
+ Removing intermediate container 093d95690d37
+  ---> 618afb857809
+ Step 3/3 : COPY docker/ .
+  ---> fcbd74c14564
+ Successfully built fcbd74c14564
+ Successfully tagged webtier:win
+
+ c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>
+ c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>
+ c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>
+ c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>docker-compose up -d
+ Creating dockercomposemultiplatform_apitier_1 ... done
+ Creating dockercomposemultiplatform_webtier_1 ... done
+
+ c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>docker-compose ps
+                 Name                             Command             State           Ports
+ --------------------------------------------------------------------------------------------------
+ dockercomposemultiplatform_apitier_1   dotnet WebApi.dll             Up      80/tcp
+ dockercomposemultiplatform_webtier_1   C:\ServiceMonitor.exe w3svc   Up      0.0.0.0:20268->80/tcp
+*** wsl2: docker image build -t apitier:linux apitier
+[+] Building 10.1s (4/4) FINISHED
+ => [internal] load build definition from Dockerfile                                                                                                                                        0.1s
+ => => transferring dockerfile: 432B                                                                                                                                                        0.0s
+ => [internal] load .dockerignore                                                                                                                                                           0.1s
+ => => transferring context: 2B                                                                                                                                                             0.0s
+ => ERROR [internal] load metadata for docker.io/microsoft/dotnet:2.1-sdk                                                                                                                  10.0s
+ => ERROR [internal] load metadata for docker.io/microsoft/dotnet:2.1-aspnetcore-runtime                                                                                                   10.0s
+------
+ > [internal] load metadata for docker.io/microsoft/dotnet:2.1-sdk:
+------
+------
+ > [internal] load metadata for docker.io/microsoft/dotnet:2.1-aspnetcore-runtime:
+------
+failed to solve with frontend dockerfile.v0: failed to create LLB definition: failed to do request: Head https://registry-1.docker.io/v2/microsoft/dotnet/manifests/2.1-aspnetcore-runtime: dial tcp: lookup registry-1.docker.io on 192.168.65.1:53: read udp 192.168.65.3:33008->192.168.65.1:53: i/o timeout
+*** docker 2.0.0.2
+**** first attemp failed
+ Step 10/13 : FROM base AS final
+  ---> 98bce6d71e2a
+ Step 11/13 : WORKDIR /app
+  ---> Using cache
+  ---> 43d5b2dc8250
+ Step 12/13 : COPY --from=publish /app .
+ ERROR: Service 'apitier' failed to build: failed to copy files: failed to copy directory: failed to extract archive to /tmp/897ebc71287676bdef4a15e74cc05c575509adde9adf9bfb8c1d58909c2cf191-mount/app: process 372 in container 897ebc71287676bdef4a15e74cc05c575509adde9adf9bfb8c1d58909c2cf191_svm encountered an error during CloseStdin: failure in a Windows system call: The process has already exited. (0x8037011f)
+**** switched to linux, then back to windows
+***** docker-compose working but localhost:7274 did not produce the ids
+***** c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>docker-compose up -d
+ Building apitier
+ Step 1/13 : FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
+  ---> 7685a653f837
+ Step 2/13 : WORKDIR /app
+  ---> Using cache
+  ---> bbe973bd5d67
+ Step 3/13 : EXPOSE 80
+  ---> Using cache
+  ---> 98bce6d71e2a
+
+ Step 4/13 : FROM microsoft/dotnet:2.1-sdk AS build
+  ---> 69d571ddbbec
+ Step 5/13 : WORKDIR "/src/ApiTier"
+  ---> Using cache
+  ---> 801e5ba45ea7
+ Step 6/13 : COPY . .
+  ---> Using cache
+  ---> d87249084c3d
+ Step 7/13 : RUN dotnet build "WebApi.csproj" -c Release -o /app
+  ---> Using cache
+  ---> ce8ca5b0a5c6
+
+ Step 8/13 : FROM build AS publish
+  ---> ce8ca5b0a5c6
+ Step 9/13 : RUN dotnet publish "WebApi.csproj" -c Release -o /app
+  ---> Using cache
+  ---> 4ba7c4b07a44
+
+ Step 10/13 : FROM base AS final
+  ---> 98bce6d71e2a
+ Step 11/13 : WORKDIR /app
+  ---> Using cache
+  ---> 43d5b2dc8250
+ Step 12/13 : COPY --from=publish /app .
+  ---> b948ec8f1e0e
+ Step 13/13 : ENTRYPOINT ["dotnet", "WebApi.dll"]
+  ---> Running in 31d841f5c5ea
+ Removing intermediate container 31d841f5c5ea
+  ---> b5a12b85cc08
+
+ Successfully built b5a12b85cc08
+ Successfully tagged apitier:linux
+ WARNING: Image for service apitier was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+ Building webtier
+ Step 1/3 : FROM microsoft/aspnet:4.7.2-windowsservercore-1803
+ 4.7.2-windowsservercore-1803: Pulling from microsoft/aspnet
+ d9e8b01179bf: Pull complete
+ 3eb83143ff4b: Pull complete
+ 97c1d214c388: Pull complete
+ 23422103fdff: Pull complete
+ 7b0dda834947: Pull complete
+ 2666f9a29637: Pull complete
+ 3dc5f513377c: Pull complete
+ 7decfc07bba1: Pull complete
+ 2149ff53a2ba: Pull complete
+ 43a2736b76cc: Pull complete
+ Digest: sha256:a55aebebbbc4a56f6342e8f5e6eabc0ef0112de3c1b0cdae93739f7f894b0f5d
+ Status: Downloaded newer image for microsoft/aspnet:4.7.2-windowsservercore-1803
+  ---> a3488807da11
+ Step 2/3 : WORKDIR /inetpub/wwwroot
+  ---> Running in 48df7f2594d1
+ Removing intermediate container 48df7f2594d1
+  ---> 8e5e790e0d42
+ Step 3/3 : COPY docker/ .
+  ---> 3a2d872f6609
+
+ Successfully built 3a2d872f6609
+ Successfully tagged webtier:win
+ WARNING: Image for service webtier was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+ Creating dockercomposemultiplatform_apitier_1 ... done
+ Creating dockercomposemultiplatform_webtier_1 ... done
+*****  c:\cprojects\pp\virtualization\docker\DockerComposeMultiPlatform>docker-compose ps
+ The system cannot find the path specified.
+                 Name                             Command             State          Ports
+ -------------------------------------------------------------------------------------------------
+ dockercomposemultiplatform_apitier_1   dotnet WebApi.dll             Up      80/tcp
+ dockercomposemultiplatform_webtier_1   C:\ServiceMonitor.exe w3svc   Up      0.0.0.0:7274->80/tcp
+
+** [[https://www.paraesthesia.com/archive/2019/06/12/windows-and-linux-docker-containers-side-by-side/][win and lin docker side by side 06/12/2019]]
+*** Docker Desktop 2.0.0.2
+ docker version
+ Client: Docker Engine - Community
+  Version:           18.09.1
+  API version:       1.39
+  Go version:        go1.10.6
+  Git commit:        4c52b90
+  Built:             Wed Jan  9 19:34:26 2019
+  OS/Arch:           windows/amd64
+  Experimental:      false
+
+ Server: Docker Engine - Community
+  Engine:
+   Version:          18.09.1
+   API version:      1.39 (minimum version 1.24)
+   Go version:       go1.10.6
+   Git commit:       4c52b90
+   Built:            Wed Jan  9 19:50:10 2019
+   OS/Arch:          windows/amd64
+   Experimental:     true
+
+Does not work well
+
+*** latest: currently Docker Desktop 3.1.0
+ https://docs.docker.com/docker-for-windows/release-notes/ to download older versions of Docker Desktop
+
+*** docker community 18.03.0
+Does not support version in compose file?
+Version 3.3 runs
+Version 2.2 does not support "platform"
+
+"platform" is added in 2.4, and removed with 3.x
+
+docker-compose 1.20.1 does not support platform
+docker-compose 1.21.0 first version to support platform
+   file version 2.4
+
+
+
+*** c:\cprojects\pp\virtualization\docker\docker-ci-zap>docker-ci-zap.exe -folder "d:\docker"
+docker-ci-zap.exe -folder "d:\docker"
+INFO: Zapped successfully
+
+** checkpoint: 
+This book is good but the docker desktop is out of date.
+The key issues are :
+1. traefik does not provide windows version for 2004, so author created his own image at sixeyed/traefik:v1.7.8-windowservercore-ltsc2019
+   This does not run well for Win10 2004.
+2. The use of docker-compose for orchestration is marred by inconsistent supported
+   a. --platform was removed along the way so latest Docker Desktop 3.0.1 does not use it.
+3. ch06 cannot be used because the 'platform' keyword is not supported in docker-compose 3.x format.
+   Seeting the format to 2.4 still does not work.
+4. The orchestration part of this book is therefore not going to work well.
+5. Consider using kubernetes for orchestration then since docker-com
+
+

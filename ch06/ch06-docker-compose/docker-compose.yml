@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.3'
 
 services:
   
@@ -17,6 +17,7 @@ services:
       - nd-net
 
   reverse-proxy:
+
     image: sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019
     command: --docker --docker.endpoint=npipe:////./pipe/docker_engine --api
     ports:
