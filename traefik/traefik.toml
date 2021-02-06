@@ -1,0 +1,8 @@
+## traefik.toml
+# API and dashboard configuration
+[api]
+   insecure = true
+
+# docker backend
+[docker]
+   domain = "docker.localhost"

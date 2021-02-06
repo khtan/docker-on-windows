@@ -15,19 +15,21 @@ namespace NerdDinner.Controllers
         private StreamWriter _Log;
 
         static HomeController()
-        {            
-            var homepageUrl = Environment.GetEnvironmentVariable("HOMEPAGE_URL", EnvironmentVariableTarget.Machine);            
-            if (!string.IsNullOrEmpty(homepageUrl))
-            {
+        {
+            var homepageUrl = Environment.GetEnvironmentVariable("HOMEPAGE_URL", EnvironmentVariableTarget.Machine);
+            if (string.IsNullOrEmpty(homepageUrl)){
+                Console.WriteLine("HOMEPAGE_URL not set");
+            } else {
+                Console.WriteLine($"HOMEPAGE_URL={homepageUrl}");
                 var request = WebRequest.Create(homepageUrl);
                 using (var response = request.GetResponse())
                 using (var responseStream = new StreamReader(response.GetResponseStream()))
                 {
                     _NewHomePageHtml = responseStream.ReadToEnd();
                 }
-            } 
+            }
         }
-        
+
         public ActionResult Index()
         {
             if (!string.IsNullOrEmpty(_NewHomePageHtml))
@@ -50,6 +52,6 @@ namespace NerdDinner.Controllers
         public ActionResult About()
         {
             return View();
-        }  
+        }
     }
 }

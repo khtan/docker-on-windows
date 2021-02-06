@@ -10,4 +10,4 @@
 # ---docker?
 # --docker.endpoint?
 
-docker container run -d -p 80:80 --name reverse-proxy -v /var/run/docker.sock:/var/run/docker.sock traefik:v1.7.8 --api --logLevel=DEBUG
+docker container run -d -p 80 -p 8080 --name reverse-proxy -v /var/run/docker.sock:/var/run/docker.sock traefik:v1.7.8

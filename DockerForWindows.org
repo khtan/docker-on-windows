@@ -6,6 +6,9 @@
 #+PROPERTY: urg_ALL immediate shortterm longterm
 #+PROPERTY: loc_ALL home office
 #+COLUMNS: %imp %urg %loc
+* [[https://www.freecodecamp.org/news/the-docker-handbook][freecodecamp: docker handbook]]
+[[https://www.freecodecamp.org/news/the-docker-handbook/#network-manipulation-basics-in-docker][docker networking]]
+
 * [[F:\ebooks\lib-sw\sw\virtualization\Docker\DockerForWindows\DockerOnWindows.2ed.2019.pdf][Docker For Windows 2ed 2019]] [[F:\ebooks\lib-sw\sw\virtualization\Docker\DockerForWindows\DockerOnWindows.2ed.2019.toc.pdf][toc]] [[C:\cprojects\pp\virtualization\docker\Docker-on-Windows-Second-Edition][code]]
 ** meta
   Elton created weekly contents for docker in his blog, then turned them into his book
@@ -1920,11 +1923,37 @@ db86d4bf9c883eee637de1de1a28f55205623944df9d960c7267100f5fe50d00
 ch03-nerd-dinner-web 80/tcp -> 0.0.0.0:23908
 ch03-nerd-dinner-db 1433/tcp -> 0.0.0.0.1433
 
+Since there is no EXPOSE <portnum>, how does the IIS port get mapped differently each time?
+   The web site uses the default :80 port but Docker exposes it on another port.
+   Q) How?
+
+******* In ch03-nerd-dinner-web/src
+.vs/config/applicationhost.config : bindingInfo: 10581:localhost
+.vs/NerdDinner/config/applicationhost.config: bindingInfo: 10581:localhost
+NerdDinner/NerdDinner.csproj : localhost:10581 
+
+Since this is a web app, it will always try to bind to port 80 in the container.
+
+******* XXX
+cd ch03-nerd-dinner-web
+docker image build -f Dockerfile.v2 -t ch03-nerd-dinner-web .
+docker container run -d -P --name nerd-dinner-web ch03-nerd-dinner-web
+
 ***** breaking up monolithic applications
 ****** extracting high value components from monoliths
 ****** hosting a ui component in asp.net core app
 [[file:ch03/8-ch03-nerd-dinner-homepage/Dockerfile::# escape=`][8-ch03-nerd-dinner-homepage]]
 ****** connecting to app containers from other app containers
+docker container run -d -p 1433:1433 --name nerd-dinner-db -v d:\databases\nd:C:\data dockeronwindows\ch03-nerd-dinner-db:2e 
+docker container run -d -P --name nerd-dinner-homepage dockeronwindows/ch03-nerd-dinner-homepage:2e
+docker container run -d -P --name nerd-dinner-web2 dockeronwindows/ch03-nerd-dinner-web:v2
+
+docker container run -d -P --name nerd-dinner-web ch03-nerd-dinner-web
+docker container run -d -P --name nerd-dinner-web -v c:\programs\emacs:c:\emacs ch03-nerd-dinner-web
+
+HOMEPAGE_URL referenced in [[file:ch03/ch03-nerd-dinner-web/src/NerdDinner/Controllers/HomeController.cs::var homepageUrl = Environment.GetEnvironmentVariable("HOMEPAGE_URL", EnvironmentVariableTarget.Machine);][HomeController.cs]] and [[file:ch03/ch03-nerd-dinner-web/Dockerfile.v2::ENV HOMEPAGE_URL="http://nerd-dinner-homepage"][Dockerfile.v2]]
+In [[file:ch03/ch03-nerd-dinner-web/Dockerfile::HOMEPAGE_URL=""][Dockerfile]], HOMEPAGE_URL is ""
+
 ***** summary
 public entry => nerd-dinner-web
                   nerd-dinner-homepage
@@ -2632,7 +2661,20 @@ This book uses MacOs but there is no source code to download.
 So I expect a Windows version can work.
 
 apress: https://www.apress.com/us/book/9781484263754
-*** linux docker-compose.yml
+*** linux simple.lin.dc.yml
+Able to see the containers on windows side with their names traefik_traefik_1 and traefik_whoami_1
+traefik_traefik_1 : http://localhost:8080/api/rawdata works
+traefik_whoami_1 : browser on http://whoami.docker.localhost works
+*** how to convert dc.yml to command line
+docker container run -d -p 80:80 -p 8080:8080 --name traefik -v /var/run/docker.sock:/var/run/docker.sock traefik:v2.3 --api.insecure=true --providers.docker
+docker container run -d -p 80 --name whoami -l 'traefik.routers.whoami.rule=Host(`whoami.docker.localhost`)' traefik/whoami // does not work
+
+http://whoami.docker.localhost does not show whoami but an IIS? why?
+
+The problem is translating a docker-compose syntax back to command line
+
+
+*** linux simple.lin.dc.yml
 
 version: '3'
 
@@ -3048,3 +3090,28 @@ The key issues are :
 5. Consider using kubernetes for orchestration then since docker-com
 
 
+** docker container run : ports
+There are 3 options in "run" that are similar
+       --expose list                    Expose a port or a range of ports
+   -p, --publish list                   Publish a container's port(s) to
+                                        the host
+   -P, --publish-all                    Publish all exposed ports to
+                                        random ports
+
+There is also the EXPOSE command in Dockefile. This is more of a documentation convention.
+
+1. Notice that there are 2 short option version, -P and -p while there is no -e ( for environment variable )
+2. -P is not the higher version of -p but it publishes all exposed ports
+
+Here are the 2 cases to consider:
+a. docker run -p 8081:80 // 8081 is host, 80 is container 
+b. docker run -p 80 // <random> is host, 80 is container 
+
+https://www.ctl.io/developers/blog/post/docker-networking-rules
+
+** how to run emacs in a docker container
+*** windows
+host : docker container run -d -P --name nerd-dinner-web -v c:\programs\emacs:c:\emacs ch03-nerd-dinner-web // maps c:\emacs to a known good emacs installation
+cli  : c:\emacs\bin\emacs.exe -nw // run emacs in the terminal 
+
+*** linux
