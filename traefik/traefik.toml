@@ -2,7 +2,7 @@
 # API and dashboard configuration
 [api]
    insecure = true
-
+   dashboard = true
 # docker backend
 [docker]
    domain = "docker.localhost"

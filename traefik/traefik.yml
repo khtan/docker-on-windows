@@ -6,3 +6,4 @@ providers:
 ## api
 api:
   insecure: true
+  dashboard: true

@@ -2667,7 +2667,7 @@ traefik_traefik_1 : http://localhost:8080/api/rawdata works
 traefik_whoami_1 : browser on http://whoami.docker.localhost works
 *** how to convert dc.yml to command line
 docker container run -d -p 80:80 -p 8080:8080 --name traefik -v /var/run/docker.sock:/var/run/docker.sock traefik:v2.3 --api.insecure=true --providers.docker
-docker container run -d -p 80 --name whoami -l 'traefik.routers.whoami.rule=Host(`whoami.docker.localhost`)' traefik/whoami // does not work
+docker container run -d -p 80 --name whoami2 -l 'traefik.routers.whoami.rule=Host(`whoami2.docker.localhost`)' traefik/whoami2 // does not work
 
 http://whoami.docker.localhost does not show whoami but an IIS? why?
 
