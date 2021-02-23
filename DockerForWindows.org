@@ -2118,12 +2118,10 @@ Log:
 time="2021-01-16T18:11:08-08:00" level=error msg="Failed to retrieve information of the docker client and server host: error during connect: Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running."
 time="2021-01-16T18:11:08-08:00" level=error msg="Provider connection error Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running.\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:182\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:137\ngithub.com/containous/traefik/safe.OperationWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:160\ngithub.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify\n\t/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:252\ngithub.com/containous/traefik/safe.(*Pool).GoCtx.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:62\ngithub.com/containous/traefik/safe.GoWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:142\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1333\nerror during connect\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).doRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:185\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).sendRequest\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:122\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).get\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/request.go:37\ngithub.com/containous/traefik/vendor/github.com/docker/docker/client.(*Client).ServerVersion\n\t/go/src/github.com/containous/traefik/vendor/github.com/docker/docker/client/version.go:12\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1.1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:137\ngithub.com/containous/traefik/safe.OperationWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:160\ngithub.com/containous/traefik/vendor/github.com/cenk/backoff.RetryNotify\n\t/go/src/github.com/containous/traefik/vendor/github.com/cenk/backoff/retry.go:37\ngithub.com/containous/traefik/provider/docker.(*Provider).Provide.func1\n\t/go/src/github.com/containous/traefik/provider/docker/docker.go:252\ngithub.com/containous/traefik/safe.(*Pool).GoCtx.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:62\ngithub.com/containous/traefik/safe.GoWithRecover.func1\n\t/go/src/github.com/containous/traefik/safe/routine.go:142\nruntime.goexit\n\t/usr/local/go/src/runtime/asm_amd64.s:1333, retrying in 369.950822ms"
 
-
 ****** routing http requests between containers with a reverse proxy
 nginx
 haproxy
 traefik
-
 
 ****** proxying traffic from docker containers with traefik
 // ? name
@@ -2136,6 +2134,21 @@ docker container run -d `
  --name nerd-dinner-api `
  -l "traefik.frontend.rule=Host:api.nerddinner.local" `
  dockeronwindows/ch05-nerd-dinner-api:2e;
+
+****** air vs kwee1
+With traefik 1.7.8 running natively, was able to get all the services running
+  |                                  |         | air          | kwee1     |                              |
+  | http://localhost:8080/api        | traefik | ok           | ok        |                              |
+  | http://localhost:8080/#dashboard | tarefik | ok           | ok        |                              |
+  | http://nerddinner.local          |         | cannot reach | works     | //air hosts file not updated |
+  | http://api.nerddinner.local      |         | cannot reach | not found |                              |
+  | http://nerddinner.local          |         | iis          | works     | //air hosts file updated     |
+  | http://api.nerddinner.local      |         | iis          | not found |                              |
+  |                                  |         |              |           |                              |
+****** creating a Win 2004 compatible version of traefik 1.7.8
+Dockerhub sixeyed/traefik => Github https://github.com/sixeyed/docker-windows-workshop/blob/master/docker/frontend-reverse-proxy/reverse-proxy/Dockerfile
+Stefan Dockerhub https://hub.docker.com/r/stefanscherer/traefik-windows => Github https://github.com/StefanScherer/dockerfiles-windows/tree/main/traefik
+
 
 ***** Adding new features in containers
 ****** Using Elasticsearch with Docker and .NET
@@ -3089,7 +3102,6 @@ The key issues are :
 4. The orchestration part of this book is therefore not going to work well.
 5. Consider using kubernetes for orchestration then since docker-com
 
-
 ** docker container run : ports
 There are 3 options in "run" that are similar
        --expose list                    Expose a port or a range of ports
@@ -3115,3 +3127,6 @@ host : docker container run -d -P --name nerd-dinner-web -v c:\programs\emacs:c:
 cli  : c:\emacs\bin\emacs.exe -nw // run emacs in the terminal 
 
 *** linux
+** stefan scherer
+[[http://stefanscherer.github.io/is-there-a-windows-docker-image-for/][is there a windows docker image for ...?]]
+[[http://stefanscherer.github.io/how-to-run-encrypted-windows-websites-with-docker-and-traefik/][how to run encrypted win websites with docker and traefik]]
