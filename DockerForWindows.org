@@ -2135,7 +2135,7 @@ docker container run -d `
  -l "traefik.frontend.rule=Host:api.nerddinner.local" `
  dockeronwindows/ch05-nerd-dinner-api:2e;
 
-****** air vs kwee1
+ht****** air vs kwee1
 With traefik 1.7.8 running natively, was able to get all the services running
   |                                  |         | air          | kwee1     |                              |
   | http://localhost:8080/api        | traefik | ok           | ok        |                              |
@@ -2158,7 +2158,6 @@ https://hub.docker.com/_/microsoft-windows-servercore?tab=description
 
 docker image build -t tankh1/traefik:v1.7.8-win2004 .
 docker image push tankh1/traefik:v1.7.8-win2004
-
 
 ***** Adding new features in containers
 ****** Using Elasticsearch with Docker and .NET
