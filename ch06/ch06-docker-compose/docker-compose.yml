@@ -18,7 +18,7 @@ services:
 
   reverse-proxy:
 
-    image: sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019
+    image: tankh1/traefik:v1.7.8-win2004
     command: --docker --docker.endpoint=npipe:////./pipe/docker_engine --api
     ports:
       - "80:80"
