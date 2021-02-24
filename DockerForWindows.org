@@ -47,9 +47,9 @@ I noticed that yr next book is not about Swarm, but Kubernetes. Does that jive w
 [[https://blog.sixeyed.com/windows-weekly-dockerfile-21-nerd-dinner/][#21: back to nerd dinner]]
 
 
-[[https://blog.sixeyed.com/windows-dockerfile-24/][#24: building distributed .net apps]]
-[[
-https://blog.sixeyed.com/windows-dockerfile-25/][#25: self-service analytics for legacy .net apps]]
+[[https://blog.sixeyed.com/windows-weekly-dockerfile-24/][#24: building distributed .net apps]]
+[[https://blog.sixeyed.com/windows-dockerfile-25/][#25: self-service analytics for legacy .net apps]]
+
 [[https://blog.sixeyed.com/windows-dockerfile-26/][#26: managing and upgrading apps with docker compose]]
 ** NerdDinner
 [[https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions-1/nerddinner/introducing-the-nerddinner-tutorial][NerdDinner tutorial]]
@@ -2148,6 +2148,16 @@ With traefik 1.7.8 running natively, was able to get all the services running
 ****** creating a Win 2004 compatible version of traefik 1.7.8
 Dockerhub sixeyed/traefik => Github https://github.com/sixeyed/docker-windows-workshop/blob/master/docker/frontend-reverse-proxy/reverse-proxy/Dockerfile
 Stefan Dockerhub https://hub.docker.com/r/stefanscherer/traefik-windows => Github https://github.com/StefanScherer/dockerfiles-windows/tree/main/traefik
+
+https://cloudblogs.microsoft.com/opensource/2019/01/17/improved-discovery-experience-microsoft-containers-docker-hub/
+
+https://hub.docker.com/_/microsoft-windows-servercore?tab=description
+   This lists all the windows/servercore images that is provided by Microsoft
+   ltsc2019 ltsc=long term servicing channel
+   20H2 sac=semi-annual channel
+
+docker image build -t tankh1/traefik:v1.7.8-win2004 .
+docker image push tankh1/traefik:v1.7.8-win2004
 
 
 ***** Adding new features in containers

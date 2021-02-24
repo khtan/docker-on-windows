@@ -14,7 +14,7 @@ docker container run -d `
 docker container run -d -p 80:80 -p 8080:8080 `
  --name reverse-proxy ` --isolation process
  -v \\.\pipe\docker_engine:\\.\pipe\docker_engine `
- sixeyed/traefik:v1.7.8-windowsservercore-ltsc2019 `
+ tankh1/traefik:v1.7.8-win2004 `
  --api --docker --docker.endpoint=npipe:////./pipe/docker_engine --logLevel=DEBUG
 
 docker container run -d `
