@@ -11,7 +11,7 @@ docker container run -d `
   --name nerd-dinner-save-handler `
   dockeronwindows/ch05-nerd-dinner-save-handler:2e;
 
-docker container run -d -p 80 -p 8080 `
+docker container run -d -p 80 -p 8080 --isolation process `
   --name reverse-proxy `
  -v \\.\pipe\docker_engine:\\.\pipe\docker_engine `
  tankh1/traefik:v1.7.8-win2004 `

@@ -8,7 +8,35 @@
 #+COLUMNS: %imp %urg %loc
 * [[https://www.freecodecamp.org/news/the-docker-handbook][freecodecamp: docker handbook]]
 [[https://www.freecodecamp.org/news/the-docker-handbook/#network-manipulation-basics-in-docker][docker networking]]
+* [[https://docs.docker.com/desktop/][Docker Docs: Docker Desktop]]
+** overview
+** windows
+** dashboard
+*** voting app
+**** notes
+ https://github.com/dockersamples/example-voting-app.git
+ git clone https://github.com/dockersamples/example-voting-app.git
+ windows:
+    docker-compose -f docker-compose-windows.yml build
+    docker-compose -f docker-compose-windows.yml up -d
+    http://localhost:5000
+    http://localhost:5001
+**** START problem : //air shows images but //kwee1 does not
+     - State "START"      from              [2021-02-26 Fri 10:11]
+ This is a simple app that works for docker-compose on both //air and //kwee1
+ It also shows that while //air will display the images, //kwee1 does not
 
+** [[https://docs.docker.com/desktop/faqs/][faqs]]
+*** Windows Logs and Troubleshooting
+*** How do I connect to the remote Docker Engine API?
+mac and windows wsl2 unix://var/run/docker.sock
+DOCKER_HOST and DOCKER_CERT_PATH
+named pipe: npipe:////./pipe/docker_engine 
+tcp://localhost:2375
+*** How do I connect from a container to a service on the host?
+host.docker.internal
+*** How do I connect to a container from Mac/Windows
+Publish a port -- port forwarding works for localhost using -p, --publish or -P
 * [[F:\ebooks\lib-sw\sw\virtualization\Docker\DockerForWindows\DockerOnWindows.2ed.2019.pdf][Docker For Windows 2ed 2019]] [[F:\ebooks\lib-sw\sw\virtualization\Docker\DockerForWindows\DockerOnWindows.2ed.2019.toc.pdf][toc]] [[C:\cprojects\pp\virtualization\docker\Docker-on-Windows-Second-Edition][code]]
 ** meta
   Elton created weekly contents for docker in his blog, then turned them into his book
@@ -45,8 +73,9 @@ I noticed that yr next book is not about Swarm, but Kubernetes. Does that jive w
 [[https://blog.sixeyed.com/windows-weekly-dockerfile-19-integrating-ui-containers/][#19: integrating ui containers]]
 [[https://blog.sixeyed.com/windows-weekly-dockerfile-20-running-your-own-registry/][#20: running your own registry]]
 [[https://blog.sixeyed.com/windows-weekly-dockerfile-21-nerd-dinner/][#21: back to nerd dinner]]
-
-
+[[https://blog.sixeyed.com/about-mta/][modernizing traditional apps]]
+[[https://blog.sixeyed.com/windows-weekly-dockerfile-2-2/][#22 extracting features from monoliths]]
+[[https://blog.sixeyed.com/windows-weekly-dockerfile-23/][#23 building mixed .net and .net core sln]]
 [[https://blog.sixeyed.com/windows-weekly-dockerfile-24/][#24: building distributed .net apps]]
 [[https://blog.sixeyed.com/windows-dockerfile-25/][#25: self-service analytics for legacy .net apps]]
 
@@ -2135,16 +2164,27 @@ docker container run -d `
  -l "traefik.frontend.rule=Host:api.nerddinner.local" `
  dockeronwindows/ch05-nerd-dinner-api:2e;
 
-ht****** air vs kwee1
-With traefik 1.7.8 running natively, was able to get all the services running
-  |                                  |         | air          | kwee1     |                              |
-  | http://localhost:8080/api        | traefik | ok           | ok        |                              |
-  | http://localhost:8080/#dashboard | tarefik | ok           | ok        |                              |
-  | http://nerddinner.local          |         | cannot reach | works     | //air hosts file not updated |
-  | http://api.nerddinner.local      |         | cannot reach | not found |                              |
-  | http://nerddinner.local          |         | iis          | works     | //air hosts file updated     |
-  | http://api.nerddinner.local      |         | iis          | not found |                              |
-  |                                  |         |              |           |                              |
+****** air vs kwee1
+httWith traefik 1.7.8 running natively, was able to get all the services running
+  |                                        |         | air          | kwee1              |                              |
+  | http://localhost:8080/api              | traefik | ok           | ok                 |                              |
+  | http://localhost:8080/#dashboard       | tarefik | ok           | ok                 |                              |
+  | http://nerddinner.local                |         | cannot reach | works              | //air hosts file not updated |
+  | http://api.nerddinner.local            |         | cannot reach | not found          |                              |
+  | http://api.nerddinnerlocal/api/dinners |         |              | works, empty array |                              |
+  | http://nerddinner.local                |         | iis          | works              | //air hosts file updated     |
+  | http://api.nerddinner.local            |         | iis          | not found          |                              |
+  | http://kibana.nerddinner.local         |         |              | ok                 |                              |
+
+[2021-02-24 Wed 11:50]
+removed isolation line in kwee1, docker-compose up seems to hang
+   finally got error message that nerd-dinner-save-handler : cannot start service
+   reverse-proxy: failed to retrieve, error during connect
+      > time="2021-02-24T11:58:07-08:00" level=error msg="Failed to retrieve information of the docker client and server host: error during connect: Get http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/version: open //./pipe/docker_engine: message readmode pipes not supported In the default daemon configuration on Windows, the docker client must be run elevated to connect. This error may also indicate that the docker daemon is not running."
+
+//kwee1
+  Adding a user fails in nerddinner.local
+
 ****** creating a Win 2004 compatible version of traefik 1.7.8
 Dockerhub sixeyed/traefik => Github https://github.com/sixeyed/docker-windows-workshop/blob/master/docker/frontend-reverse-proxy/reverse-proxy/Dockerfile
 Stefan Dockerhub https://hub.docker.com/r/stefanscherer/traefik-windows => Github https://github.com/StefanScherer/dockerfiles-windows/tree/main/traefik
@@ -2158,6 +2198,10 @@ https://hub.docker.com/_/microsoft-windows-servercore?tab=description
 
 docker image build -t tankh1/traefik:v1.7.8-win2004 .
 docker image push tankh1/traefik:v1.7.8-win2004
+
+******* curious: Docker Desktop does shows images in air but not kwee1
+On //air, when docker-compose runs, images are seen in Docker Desktop
+on //kwee1, when docker-compose runs, images are not seen in Docker Desktop
 
 ***** Adding new features in containers
 ****** Using Elasticsearch with Docker and .NET
