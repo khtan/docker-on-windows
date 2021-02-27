@@ -2166,15 +2166,15 @@ docker container run -d `
 
 ****** air vs kwee1
 httWith traefik 1.7.8 running natively, was able to get all the services running
-  |                                        |         | air          | kwee1              |                              |
-  | http://localhost:8080/api              | traefik | ok           | ok                 |                              |
-  | http://localhost:8080/#dashboard       | tarefik | ok           | ok                 |                              |
-  | http://nerddinner.local                |         | cannot reach | works              | //air hosts file not updated |
-  | http://api.nerddinner.local            |         | cannot reach | not found          |                              |
-  | http://api.nerddinnerlocal/api/dinners |         |              | works, empty array |                              |
-  | http://nerddinner.local                |         | iis          | works              | //air hosts file updated     |
-  | http://api.nerddinner.local            |         | iis          | not found          |                              |
-  | http://kibana.nerddinner.local         |         |              | ok                 |                              |
+  |                                         |         | air          | kwee1              |                              |
+  | http://localhost:8080/api               | traefik | ok           | ok                 |                              |
+  | http://localhost:8080/#dashboard        | tarefik | ok           | ok                 |                              |
+  | http://nerddinner.local                 |         | cannot reach | works              | //air hosts file not updated |
+  | http://api.nerddinner.local             |         | cannot reach | not found          |                              |
+  | http://api.nerddinner.local/api/dinners |         |              | works, empty array |                              |
+  | http://nerddinner.local                 |         | iis          | works              | //air hosts file updated     |
+  | http://api.nerddinner.local             |         | iis          | not found          |                              |
+  | http://kibana.nerddinner.local          |         |              | ok                 |                              |
 
 [2021-02-24 Wed 11:50]
 removed isolation line in kwee1, docker-compose up seems to hang

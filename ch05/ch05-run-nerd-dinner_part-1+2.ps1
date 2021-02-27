@@ -17,13 +17,13 @@ docker container run -d -p 80 -p 8080 --isolation process `
  tankh1/traefik:v1.7.8-win2004 `
  --api --docker --docker.endpoint=npipe:////./pipe/docker_engine --logLevel=DEBUG
 
-docker container run -d `
+docker container run -d -P `
  --name nerd-dinner-homepage `
  -l "traefik.frontend.rule=Host:nerddinner.local;Path:/,/css/site.css" `
  -l "traefik.frontend.priority=10" `
  dockeronwindows/ch03-nerd-dinner-homepage:2e;
 
-docker container run -d `
+docker container run -d -P `
  --name nerd-dinner-web `
  --env-file api-keys.env `
  -l "traefik.frontend.rule=Host:nerddinner.local;PathPrefix:/" `
@@ -32,7 +32,7 @@ docker container run -d `
  -e "DinnerApi:Enabled=true" `
  dockeronwindows/ch05-nerd-dinner-web:2e;
 
-docker container run -d `
+docker container run -d -P `
  --name nerd-dinner-api `
  -l "traefik.frontend.rule=Host:api.nerddinner.local" `
  dockeronwindows/ch05-nerd-dinner-api:2e;
